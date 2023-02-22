@@ -6,198 +6,188 @@
 /*   By: ehasalu <ehasalu@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/10 20:01:32 by ehasalu           #+#    #+#             */
-/*   Updated: 2023/02/21 20:57:39 by ehasalu          ###   ########.fr       */
+/*   Updated: 2023/02/22 16:17:24 by ehasalu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 #include <stdio.h>
 
-int	vop(t_list **lst, int pos)
+
+int	calc_medi(t_stack **a)
 {
 	int	i;
-	t_list *temp;
+	int	num;
+	int	*arr;
+	int	res;
 
 	i = 1;
-	temp = *lst;
-	while (i != pos)
+	num = highest(a);
+	arr = malloc(sizeof(int) * lst_len(*a));
+	arr[lst_len(*a) - i] = num;
+	while (i < lst_len(*a))
 	{
-		temp = temp->next;
 		i++;
+		arr[lst_len(*a) - i] = sn_lowest((a), num);
+		num = sn_lowest((a), num);
 	}
-	return (ft_atoi(temp->content));
+	arr[lst_len(*a)] = '\0';
+	if (lst_len(*a) % 2 != 0)
+		res = arr[lst_len(*a) / 2];
+	else
+	{
+		res = (arr[(lst_len(*a) / 2)] + arr[(lst_len(*a) / 2 ) - 1]) / 2;
+	}
+	free(arr);
+	return (res);
 }
 
-
-int	lst_len(t_list **lst)
+void	assign_med(t_stack **a)
 {
-	t_list *temp;
-	int	i;
+	t_stack	*temp;
 
-	i = 0;
-	temp = lst;
-	while (temp->next != NULL)
+	temp = *a;
+	while (temp != NULL)
 	{
+		if (temp->content <= calc_medi(a))
+			temp->med = 1;
+		else
+			temp->med = 2;
 		temp = temp->next;
-		i++;
 	}
-	return (i);
 }
 
-int	b_is_empty(t_list **b)
+int	high_med(t_stack **a)
 {
-	if (*b!= NULL)
-		return (0);
-	return (1);
-}
-int	a_is_sort(t_list **a)
-{
-	int	i;
+	t_stack	*temp;
 
-	i = 1;
-	while (i < lst_len(a))
+	temp = *a;
+	while (temp != NULL)
 	{
-		if (vop(a, i) > vop(a, i + 1))
+		if (temp->med == 1)
 			return (0);
-		i++;
+		temp = temp->next;
 	}
 	return (1);
 }
 
-void	algorithm_stuff(t_list **a, t_list **b)
+void	put_a_to_b (t_stack **a, t_stack **b)
 {
-	if (case1(a))
-		sa(a);
-	if (case2(a))
+	while (!b_is_empty(a))
 	{
-		sa(a);
-		rra(a);
+		while (vop(a, 1) != highest(a))
+			ra(a);
+		pb(a, b);
 	}
-	if (case3(a))
-		ra(a);
-	if (case4(a))
-	{
-		sa(a);
-		ra(a);
-	}
-	if (case5(a))
-		rra(a);
 }
 
-int	highest(t_list **lst)
+void	put_b_to_a(t_stack **a, t_stack **b)
 {
-	int num;
-	int	i;
-
-	i = 1;
-	num = 0;
-	while (i <= lst_len(lst))
-	{
-		if (vop(lst, i) > num)
-			num = vop(lst, i);
-		i++;
+	if (!b_is_empty(b))
+	{	
+		while (vop(b, 1) != highest(b))
+			rb(b);
+		pa(a, b);
 	}
-	return (num);
 }
 
-int closest(t_list **lst, int num)
+void	under_hun(t_stack **a, t_stack **b)
 {
-	int	i;
-
-	i = 1;
-	while (i < lst_len(lst))
+	if (vom(a, 1) == 1)
 	{
-		if (vop(lst, i) < num && vop(lst, i + 1) > num)
-			return (vop(lst, i + 1));
-		i++;
+		if (b_is_empty(b))
+		{	
+			pb(a, b);
+			under_hun(a, b);
+		}
+		else
+		{
+			if (vop(a, 1) > lowest(b))
+			{
+				while (vop(b, lst_len(*b)) != sn_lowest(b, vop(a, 1)))
+					rb(b);
+			}
+			else
+			{
+				while (vop(b, 1) != lowest(b))
+				rb(b);
+			}
+			pb(a, b);
+			under_hun(a, b);
+		}
 	}
-	return (highest(lst));
-}
-
-int	lowest(t_list **lst)
-{
-	int num;
-	int	i;
-
-	i = 1;
-	num = vop(lst, i);
-	while (i <= lst_len(lst))
+	else if (vom(a, 1) == 2 && high_med(a))
 	{
-		if (vop(lst, i) < num)
-			num = vop(lst, i);
-		i++;
+		while (vop(b, 1) != lowest(b))
+			rb(b);
+		put_a_to_b(a, b);
+		while (vop(b, 1) != highest(b))
+			rb(b);
+		while (!b_is_empty(b))
+		{
+			pa(a, b);
+			if (!b_is_empty(b))
+				rrb(b);
+		}
 	}
-	return (num);
+	// else
+	// 	ra(a);
+	// if (b_is_empty(a))
+	// {
+	// 	while (vop(b, 1) != lowest(b))
+	// 	{
+	// 		rb(b);
+	// 	}
+	// 	while (!b_is_empty(b))
+	// 		pa(a, b);
+	// }
 }
 
 int main(int argc, char **argv)
 {
-	int	i;
-	t_list	*a;
-	t_list	*b;
-	int	flag;
+	// int	argc = 9;
+	// char **argv = ft_split("0 2 3 1 4 5 9 11 15", ' ');
 
-	flag = 1;
+	int	i;
+	t_stack	*a;
+	t_stack	*b;
+	t_stack	*temp;
+
 	i = 1;
-	a = ft_lstnew(argv[argc - 1]);
+	a = malloc(sizeof *a);
+	a->content = ft_atoi(argv[i]);
+	a->med = 0;
+	temp = a;
 	b = NULL;
-	argc--;
-    	while (argc > 1)
+	i++;
+    while (i < argc)
 	{
-	 	ft_lstadd_front(&a, ft_lstnew(argv[argc - 1]));
-	 	argc--;
+		temp->next = malloc(sizeof *a);
+		temp = temp->next;
+		temp->content = ft_atoi(argv[i]);
+		temp->med = 0;
 		i++;
 	}
-	// while (!a_is_sort(&a) || !b_is_empty(&b))
+	assign_med(&a);
+	if (lst_len(a) == 1)
+	  	return (0);
+	else if (lst_len(a) <= 5)
+	   	under_five(&a, &b);
+	else// if (lst_len(a) <= 100)
+		under_hun(&a, &b);
+	// printf("Stack A: ");
+	// while (a != NULL)
 	// {
-	// 	if (lst_len(&a) == 5)
-	// 	{
-	// 		pb(&a, &b);
-	// 	 	pb(&a, &b);
-	// 	 	algorithm_stuff(&a, &b);
-	// 	}
-		// if (lst_len(&a) == 5 && !a_is_sort(&a) && flag)
-		// {	
-		// 	pb(&a, &b);
-		// 	pb(&a, &b);
-		// 	algorithm_stuff(&a, &b);
-		// 	flag = 0;
-		// }
-		// else if (lst_len(&b) == 1 || lst_len(&b) == 2)
-		// {
-		// 	if (a && b && vop(&b, 1) < lowest(&a))
-		// 		pa(&a, &b);
-		// 	else if (a && b && vop(&b, 1) > highest(&a))
-		// 	{
-		// 		pa(&a, &b);
-		// 		ra(&a);
-		// 	}
-		// 	else 
-		// 	{
-		// 		while (vop(&a, 1) != closest(&a, vop(&b, 1)))
-		// 			ra(&a);
-		// 		pa(&a, &b);
-		// 		while (!a_is_sort(&a))
-		// 			ra(&a);
-		// 	}
-		// }
-		// if (lst_len(&a) == 3 && !a_is_sort(&a))
-		// 	algorithm_stuff(&a, &b); 
-	//}
-	algorithm_stuff(&a, &b);
-	printf("Stack A: ");
-	while (a != NULL)
-	{
-		printf("%s ", a->content);
-		a = a->next;
-	}
-	printf("\n");
-	printf("Stack B: ");
-	while (b != NULL)
-	{
-		printf("%s ", b->content);
-		b = b->next;
-	}
+	// 	printf("%d ", a->content);
+	// 	a = a->next;
+	// }
+	// printf("\n");
+	// printf("Stack B: ");
+	// while (b != NULL)
+	// {
+	// 	printf("%d ", b->content);
+	// 	b = b->next;
+	// }
 	
 	
 }
