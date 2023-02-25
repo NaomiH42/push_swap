@@ -6,7 +6,7 @@
 /*   By: ehasalu <ehasalu@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/10 20:01:32 by ehasalu           #+#    #+#             */
-/*   Updated: 2023/02/22 16:17:24 by ehasalu          ###   ########.fr       */
+/*   Updated: 2023/02/25 22:01:39 by ehasalu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,57 @@ int	find_pos(t_stack **lst, int num)
 			return (i);
 		i++;
 	}
+	return (0);
+}
+
+int	**create_arrays_big(t_stack **a)
+{
+	int	i;
+	int	num;
+	int	*arr;
+	int	**arrays;
+	int	l;
+	int	k;
+
+	i = 1;
+	num = highest(a);
+	arr = malloc(sizeof(int) * lst_len(*a) + 1);
+	arr[lst_len(*a) - i] = num;
+	while (i < lst_len(*a))
+	{
+		i++;
+		arr[lst_len(*a) - i] = sn_lowest((a), num);
+		num = sn_lowest((a), num);
+	}
+	arr[lst_len(*a)] = '\0';
+	i = 0;
+	arrays = malloc(sizeof(int*) * 12);
+	k = 0;
+	while (i < 10)
+	{
+		l = 0;
+		arrays[i] = malloc(sizeof(int) * lst_len(*a)/11);
+		while (l < lst_len(*a)/11)
+		{
+			arrays[i][l] = arr[k];
+			//printf("ARR %d: %d\n", i, arrays[i][l]);
+			k++;
+			l++;
+		}
+		arrays[i][l] = '\0';
+		i++;
+	}
+	arrays[i] = malloc(sizeof(int) * ((lst_len(*a) - (lst_len(*a)/11) * 10)));
+	l = 0;
+	while (l < (lst_len(*a) - (lst_len(*a)/11) * 10))
+	{
+			arrays[i][l] = arr[k];
+			//printf("ARR %d: %d\n", i, arrays[i][l]);
+			k++;
+			l++;
+	}
+	arrays[i][l] = '\0';
+	return (arrays);
 }
 
 int	**create_arrays(t_stack **a)
@@ -193,17 +244,27 @@ int	**create_arrays(t_stack **a)
 	return (arrays);
 }
 
-void	move_to_top(t_stack **a, int num)
+void	move_to_top(t_stack **lst, int num, char stack_l)
 {
-	if (find_pos(a, num) > (lst_len(*a) / 2))
+	if (find_pos(lst, num) > (lst_len(*lst) / 2))
 	{
-		while (vop(a, 1) != num)
-			rra(a);
+		while (vop(lst, 1) != num)
+		{
+			if (stack_l == 'a')
+				rra(lst);
+			else
+				rrb(lst);
+		}
 	}
 	else
 	{
-		while (vop(a, 1) != num)
-			ra(a);
+		while (vop(lst, 1) != num)
+		{	
+			if (stack_l == 'a')
+				ra(lst);
+			else
+				rb(lst);
+		}
 	}
 }
 
@@ -236,11 +297,11 @@ int	low_big_or(t_stack **lst, int num)
 void	move_b(t_stack **b, int num)
 {
 	if (low_big_or(b, num) == 1)
-		move_to_top(b, lowest(b));
+		move_to_top(b, lowest(b), 'b');
 	else if ((low_big_or(b, num) == -1))
-		move_to_top(b, lowest(b));
+		move_to_top(b, lowest(b), 'b');
 	else
-		move_to_top(b, closest2(b, num));
+		move_to_top(b, closest2(b, num), 'b');
 }
 
 int lst_print(t_stack *lst_a, t_stack *lst_b)
@@ -267,6 +328,30 @@ int lst_print(t_stack *lst_a, t_stack *lst_b)
     return (0);
 }
 
+void	over_hun(t_stack **a, t_stack **b, int **sep)
+{
+	int	hold_first;
+	int	hold_second;
+	int	mov_num;
+	static int i;
+
+	hold_first = scan_stack(a, sep[i], 1);
+	hold_second = scan_stack(a, sep[i], 0);
+	if ((find_pos(a, hold_first) - 1) < (lst_len(*a) - find_pos(a, hold_second)))
+		mov_num = hold_first;
+	else
+		mov_num = hold_second;
+	move_to_top(a, mov_num, 'a');
+	if (lst_len(*b))
+		move_b(b, mov_num);
+	pb(a, b);
+	if (scan_stack(a, sep[i], 1) == INT_MIN && i < 11)
+		i++;
+	if (i == 11)
+		return ;
+	over_hun(a, b, sep);
+}
+
 void	under_hun(t_stack **a, t_stack **b, int **sep)
 {
 	int	hold_first;
@@ -280,8 +365,7 @@ void	under_hun(t_stack **a, t_stack **b, int **sep)
 		mov_num = hold_first;
 	else
 		mov_num = hold_second;
-	//printf("%d", mov_num);
-	move_to_top(a, mov_num);
+	move_to_top(a, mov_num, 'a');
 	if (lst_len(*b))
 		move_b(b, mov_num);
 	pb(a, b);
@@ -289,75 +373,20 @@ void	under_hun(t_stack **a, t_stack **b, int **sep)
 		i++;
 	if (i == 5)
 		return ;
-	//lst_print(*a, *b);
 	under_hun(a, b, sep);
-	//printf("%d ", find_pos(a, hold_first));
-	//printf("%d", find_pos(a, hold_second));
-
-	// if (vom(a, 1) == 1)
-	// {
-	// 	if (b_is_empty(b))
-	// 	{
-	// 		pb(a, b);
-	// 		under_hun(a, b);
-	// 	}
-	// 	else
-	// 	{
-	// 		if (vop(a, 1) > lowest(b))
-	// 		{
-	// 			while (vop(b, lst_len(*b)) != sn_lowest(b, vop(a, 1)))
-	// 				rb(b);
-	// 		}
-	// 		else
-	// 		{
-	// 			while (vop(b, 1) != lowest(b))
-	// 			rb(b);
-	// 		}
-	// 		pb(a, b);
-	// 		under_hun(a, b);
-	// 	}
-	// }
-	// else if (vom(a, 1) == 2 && high_med(a))
-	// {
-	// 	while (vop(b, 1) != lowest(b))
-	// 		rb(b);
-	// 	put_a_to_b(a, b);
-	// 	while (vop(b, 1) != highest(b))
-	// 		rb(b);
-	// 	while (!b_is_empty(b))
-	// 	{
-	// 		pa(a, b);
-	// 		if (!b_is_empty(b))
-	// 			rrb(b);
-	// 	}
-	// }
-	// else
-	// 	ra(a);
-	// if (b_is_empty(a))
-	// {
-	// 	while (vop(b, 1) != lowest(b))
-	// 	{
-	// 		rb(b);
-	// 	}
-	// 	while (!b_is_empty(b))
-	// 		pa(a, b);
-	// }
 }
 
 void	sort_push_b(t_stack **a, t_stack **b)
 {
 	while (vop(b, 1) != highest(b))
 	{
-		move_to_top(b, highest(b));
+		move_to_top(b, highest(b), 'b');
 	}
 	pa(a, b);
 }
 
 int main(int argc, char **argv)
 {
-	// int	argc = 9;
-	// char **argv = ft_split("0 2 3 1 4 5 9 11 15", ' ');
-
 	int	i;
 	t_stack	*a;
 	t_stack	*b;
@@ -380,15 +409,23 @@ int main(int argc, char **argv)
 		temp->med = 0;
 		i++;
 	}
-	sep = create_arrays(&a);
-	// assign_med(&a);
+	if (lst_len(a) <= 100)
+		sep = create_arrays(&a);
+	else
+		sep = create_arrays_big(&a);
 	if (lst_len(a) == 1)
 	  	return (0);
 	else if (lst_len(a) <= 5)
 	   	under_five(&a, &b);
-	else// if (lst_len(a) <= 100)
+	else if (lst_len(a) <= 100)
 	{
 		under_hun(&a, &b, sep);
+		while (!b_is_empty(&b))
+			sort_push_b(&a, &b);
+	}
+	else
+	{
+		over_hun(&a, &b, sep);
 		while (!b_is_empty(&b))
 			sort_push_b(&a, &b);
 	}

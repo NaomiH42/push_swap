@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ehasalu <marvin@42.fr>                     +#+  +:+       +#+         #
+#    By: ehasalu <ehasalu@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/13 16:54:08 by ehasalu           #+#    #+#              #
-#    Updated: 2023/01/20 19:23:54 by ehasalu          ###   ########.fr        #
+#    Updated: 2023/02/25 22:07:22 by ehasalu          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,19 +31,19 @@ CFLAGS = -Wall -Wextra -Werror
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	ar rc $(NAME).a $(OBJS)
+	@ar rc $(NAME).a $(OBJS)
 
 %.o: %.c
-	$(CC) $(CFLAGS)  -c $< -o $@	
+	@$(CC) $(CFLAGS)  -c $< -o $@	
 
 bonus: $(OBJS) $(OBJS_B)
-	ar rc $(NAME).a $(OBJS) $(OBJS_B)
+	@ar rc $(NAME).a $(OBJS) $(OBJS_B)
 
 clean:
-	rm -rf $(OBJS) $(OBJS_B)
+	@rm -rf $(OBJS) $(OBJS_B)
 
 fclean: clean
-	rm -rf $(NAME).a
+	@rm -rf $(NAME).a
 
 re: fclean all
 
