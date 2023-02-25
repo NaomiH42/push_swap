@@ -18,16 +18,16 @@ LIBFT_NAME = libft.a
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
-all: $(NAME)
+all: lib $(NAME)
 
-$(LIBFT_NAME):
-	@make -C $(LIBFT_F)
+lib:
+	@make bonus -C libft
 
-$(NAME): $(LIBFT_NAME)
-	@$(CC) $(CFLAGS) $(SRCS) $(LIBFT_F)$(LIBFT_NAME) -o $(NAME)
+$(NAME):
+	$(CC) $(CFLAGS) $(SRCS) libft/libft.a -o $(NAME)
 
 clean:
-	@rm $(NAME)
+	rm $(NAME)
 	@make clean -C $(LIBFT_F)
 
 fclean: clean

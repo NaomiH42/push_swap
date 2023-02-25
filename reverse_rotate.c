@@ -28,7 +28,7 @@ void    rra(t_stack **a)
 void	rrb(t_stack **b)
 {
 	reverse_rotate(b);
-	ft_putstr_fd("rbr\n", 1);
+	ft_putstr_fd("rrb\n", 1);
 }
 
 void	rrr(t_stack **a, t_stack **b)
