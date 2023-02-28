@@ -12,10 +12,10 @@ void	rotate(t_stack **stack)
 	cur->next = temp;
 }
 
-void    ra(t_stack **a)
+void	ra(t_stack **a)
 {
-    rotate(a);
-   	ft_putstr_fd("ra\n", 1);
+	rotate(a);
+	ft_putstr_fd("ra\n", 1);
 }
 
 void	rb(t_stack **b)

@@ -19,10 +19,10 @@ void	reverse_rotate(t_stack **stack)
 	*stack = cur;
 }
 
-void    rra(t_stack **a)
+void	rra(t_stack **a)
 {
-    reverse_rotate(a);
-    ft_putstr_fd("rra\n", 1);
+	reverse_rotate(a);
+	ft_putstr_fd("rra\n", 1);
 }
 
 void	rrb(t_stack **b)
